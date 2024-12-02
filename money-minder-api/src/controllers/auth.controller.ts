@@ -14,13 +14,21 @@ export const login = async (
 ) => {
   try {
     const { email, password } = req.body;
+    console.log("Email: " + email);
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    const user = await prisma.user.findFirst({ 
+        where: { 
+          email: email 
+        } 
+      });
+      console.log(user);
+    if (user == null) {
       throw new AppError('Invalid credentials', 401);
     }
 
-    const isValidPassword = await comparePassword(password, user.password);
+    //const isValidPassword = await comparePassword(password, user.password);
+    const isValidPassword = password === user.password;
+    console.log(isValidPassword);
     if (!isValidPassword) {
       throw new AppError('Invalid credentials', 401);
     }
