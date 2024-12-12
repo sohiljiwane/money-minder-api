@@ -5,10 +5,11 @@ import helmet from 'helmet';
 import compression from 'compression';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+import expenseRoutes from './routes/expense.routes'
 import { errorHandler } from './middleware/error';
 import { limiter } from './middleware/rateLimiter';
 import { requestLogger } from './middleware/logger';
-import { login } from './controllers/auth.controller';
+import { login, logout } from './controllers/auth.controller';
 
 const app = express();
 
@@ -51,6 +52,11 @@ app.use('/api/users', userRoutes);
 
 // Login endpoint
 app.post('/api/auth/login', login);
+
+// Logout endpoint
+app.post('/api/auth/logout', logout);
+
+app.use('/api/expenses', expenseRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

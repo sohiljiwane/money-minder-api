@@ -28,3 +28,22 @@ model Session {
     lastActive DateTime @default(now())
     createdAt DateTime @default(now())
 }
+
+model Expense {
+    id Int @id @default(autoincrement())
+    type String @db.VarChar(50)
+    amount Float
+    category String @db.VarChar(50)
+    expense_date DateTime
+    description String? @db.VarChar(200)
+    created_date DateTime @default(now())
+    updated_date DateTime
+    tags Tags[]
+}
+
+model Tags {
+    id Int @id @default(autoincrement())
+    expense_id Int
+    expense Expense @relation(fields: [expense_id], references: [id], onDelete: Cascade)
+    tag_name String @db.VarChar(50)
+}

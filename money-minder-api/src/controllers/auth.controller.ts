@@ -3,7 +3,6 @@ import prisma from '../config/database';
 import { hashPassword, comparePassword } from '../utils/password';
 import { generateTokens } from '../utils/jwt';
 import { AppError } from '../middleware/error';
-import { z } from 'zod';
 
 // ... Previous register function ...
 
@@ -63,3 +62,40 @@ export const login = async (
     next(error);
   }
 };
+
+export const logout = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      // Extract user ID from the authenticated request
+      const userId = req.user?.id;
+  
+      console.log("API called and user id is " + userId);
+      if (!userId) {
+        throw new AppError('Unauthorized', 401);
+      }
+  
+      // Delete the current session
+      await prisma.session.deleteMany({
+        where: {
+          userId: userId,
+          userAgent: req.headers['user-agent'],
+          ipAddress: req.ip,
+        },
+      });
+  
+      // Update the user to remove the refresh token
+      await prisma.user.update({
+        where: { id: userId },
+        data: { refreshToken: null },
+      });
+  
+      res.json({
+        message: 'Logout successful',
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
